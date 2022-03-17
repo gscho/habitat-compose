@@ -2,6 +2,7 @@
 
 require_relative "compose/hab"
 require_relative "compose/cli"
+require_relative "compose/commands"
 require_relative "compose/version"
 
 module Compose

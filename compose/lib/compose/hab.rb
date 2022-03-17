@@ -8,6 +8,7 @@ module Compose
     def hab(cmd, opts = nil, arg = nil)
       `cd /Users/greg.schofield/workspace/gscho/simple-go-app && #{@@hab_binary} #{cmd} #{opts} #{arg}`
     end
+    
     def hab_test(cmd, opts = nil, arg = nil)
       puts "#{@@hab_binary} #{cmd} #{opts} #{arg}".squeeze(" ")
     end

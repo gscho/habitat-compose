@@ -1,50 +1,65 @@
-require "yaml"
+require "thor"
+
 module Compose
-  class CLI
+  class CLI < Thor
     include Hab
-    def initialize
-      @yaml = YAML.load_file("./habitat-compose.yml")
-      plans_to_build = {}
-      load_args = {}
-      pkgs = {}
-      config_tomls = {}
-      @yaml["services"].each_key do |svc|
-        if @yaml["services"][svc]["build"]
-          if @yaml["services"][svc]["build"].is_a? String
-            plans_to_build << @yaml["services"][svc]["build"]
-          else
-            plans_to_build[svc] = @yaml["services"][svc]["build"]["context"]
-          end
-        end
-        if @yaml["services"][svc]["load_args"]
-          load_args[svc] = @yaml["services"][svc]["load_args"].join(" ")
-        end
-        if @yaml["services"][svc]["pkg"]
-          pkgs[svc] = @yaml["services"][svc]["pkg"]
-        end
-        if @yaml["services"][svc]["config_toml"]
-          config_tomls[svc] = @yaml["services"][svc]["config_toml"]
-        end
+    class_option :verbose, desc: "Show more output from command", required: false, type: :boolean
+
+    option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
+    desc "build", "Build or rebuild packages"
+    def build
+      build = Compose::Commands::Build.new(options)
+      build.exec
+    end
+
+    option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
+    desc "up", "Load services"
+    def up
+      puts "up"
+    end
+
+    option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
+    desc "down", "Unload services"
+    def down
+      puts "down"
+    end
+
+    option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
+    desc "restart", "Restart services"
+    def restart
+      puts "restart"
+    end
+
+    option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
+    desc "start", "Start services"
+    def start
+      puts "start"
+    end
+
+    option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
+    desc "stop", "Stop services"
+    def stop
+      puts "stop"
+    end
+
+    option :follow, desc: "Follow log output", aliases: "-f", type: :boolean, default: false, required: false
+    desc "logs", "View supervisor logs"
+    def logs
+      if options["follow"]
+        `tail -f /hab/sup/default/sup.log`
+      else
+        `cat /hab/sup/default/sup.log`
       end
-      plans_to_build.each do |k,v|
-        hab_test("pkg build", nil, v)
-        last_build = File.read("/Users/greg.schofield/workspace/gscho/simple-go-app/results/last_build.env")
-        last_build.split("\n").each do |line|
-          s = line.split("=")
-          pkgs[k] = s[-1] if s[0].eql? "pkg_ident"
-        end
-      end
-      
-      pkgs.each do |svc, pkg|
-        origin, name, version, ts = pkg.split("/")
-        if config_tomls[svc]
-          puts "mkdir -p /hab/user/#{name}/config"
-          puts "touch /hab/user/#{name}/config/user.toml"
-          puts "content="
-          puts config_tomls[svc]
-        end
-        hab_test("svc load", load_args[svc], pkg)
-      end
+    end
+
+    desc "status", "View supervisor status"
+    def status
+      hab("svc status")
+    end
+
+    desc "verison", "Display version information"
+    def version
+      STDOUT.puts Compose::VERSION
     end
   end
 end
