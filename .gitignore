@@ -6,4 +6,6 @@
 /pkg/
 /spec/reports/
 /tmp/
+habitat-compose.yml
 test.rb
+results/
