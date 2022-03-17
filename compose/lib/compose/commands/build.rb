@@ -1,7 +1,7 @@
 module Compose
   module Commands
     class Build
-      include Compose::Hab
+      include Hab
 
       def initialize(opts = {})
         @yaml = Commands.load_compose_file(opts["file"])
