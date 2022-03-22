@@ -54,7 +54,7 @@ module Compose
             if defn["build"]
               yield(name, defn)
             elsif @service_name.eql?(name)
-              puts "#{@service_name} uses a pre-built pkg, skipping"
+              STDOUT.puts "#{@service_name} uses a pre-built pkg, skipping"
             end
           end
         end

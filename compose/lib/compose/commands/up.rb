@@ -3,7 +3,8 @@ module Compose
     class Up < Base
       def exec
         each_svc do |name, defn|
-          hab_test("svc load", nil, defn["pkg"])
+          options = defn["load_args"].join(" ") if defn["load_args"]
+          hab_test("svc load", options, defn["pkg"])
         end
       end
     end
