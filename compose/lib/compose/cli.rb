@@ -6,16 +6,20 @@ module Compose
     class_option :verbose, desc: "Show more output from command", required: false, type: :boolean
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
-    desc "build", "Build or rebuild packages"
-    def build
-      build = Compose::Commands::Build.new(options)
+    desc "build [SERVICE_NAME]", "Build or rebuild packages"
+    def build(service_name = "")
+      opts = options.dup
+      opts["service_name"] = service_name
+      build = Compose::Commands::Build.new(opts)
       build.exec
     end
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
-    desc "down", "Unload services"
-    def down
-      down = Compose::Commands::Down.new(options)
+    desc "down [SERVICE_NAME]", "Unload services"
+    def down(service_name = "")
+      opts = options.dup
+      opts["service_name"] = service_name
+      down = Compose::Commands::Down.new(opts)
       down.exec
     end
 
@@ -30,16 +34,20 @@ module Compose
     end
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
-    desc "restart", "Restart services"
-    def restart
-      restart = Compose::Commands::Restart.new(options)
+    desc "restart [SERVICE_NAME]", "Restart services"
+    def restart(service_name = "")
+      opts = options.dup
+      opts["service_name"] = service_name
+      restart = Compose::Commands::Restart.new(opts)
       restart.exec
     end
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
-    desc "start", "Start services"
-    def start
-      start = Compose::Commands::Start.new(options)
+    desc "start [SERVICE_NAME]", "Start services"
+    def start(service_name = "")
+      opts = options.dup
+      opts["service_name"] = service_name
+      start = Compose::Commands::Start.new(opts)
       start.exec
     end
 
@@ -49,16 +57,20 @@ module Compose
     end
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
-    desc "stop", "Stop services"
-    def stop
-      stop = Compose::Commands::Stop.new(options)
+    desc "stop [SERVICE_NAME]", "Stop services"
+    def stop(service_name = "")
+      opts = options.dup
+      opts["service_name"] = service_name
+      stop = Compose::Commands::Stop.new(opts)
       stop.exec
     end
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
-    desc "up", "Load services"
-    def up
-      up = Compose::Commands::Up.new(options)
+    desc "up [SERVICE_NAME]", "Load services"
+    def up(service_name = "")
+      opts = options.dup
+      opts["service_name"] = service_name
+      up = Compose::Commands::Up.new(opts)
       up.exec
     end
 
