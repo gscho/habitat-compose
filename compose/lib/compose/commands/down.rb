@@ -6,6 +6,7 @@ module Compose
           load_line = "Unloading #{name.ljust(@name_offset)}  ... "
           print load_line
           options = []
+          
           _exitcode, stdout, stderr = hab(
             :svc, 
             {
@@ -15,19 +16,9 @@ module Compose
             }, 
             defn["pkg"]
           )
-          statusout = defn["pkg"]
-          while statusout =~ /#{Regexp.quote(defn["pkg"])}/
-            _exitcode, statusout, statuserr = hab(
-              :svc, 
-              {
-                sub_command: "status",
-                options: ["--remote-sup=#{@remote_sup}"],
-                verbose: @verbose
-              }, 
-              defn["pkg"]
-            )
-            sleep 2
-          end
+          
+          wait_for_svc_down(defn["pkg"], remote_sup: @remote_sup, verbose: @verbose)
+          
           not_loaded = "\r#{name} is not loaded"
           (load_line.size - not_loaded.size).times {|_| not_loaded.concat(" ") }
           print not_loaded + "\n" if stderr =~ /Service #{Regexp.quote(defn["pkg"])} not loaded/

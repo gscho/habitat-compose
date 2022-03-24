@@ -39,5 +39,41 @@ module Compose
         puts "#{@@hab_binary} #{cmd} #{opts} #{arg}".squeeze(" ")
       # end
     end
+
+    def svc_loaded?(pkg, opts = {})
+      remote_sup = opts[:remote_sup] || "127.0.0.1:9632"
+      verbose = opts[:verbose] || false
+      _exitcode, statusout, statuserr = hab(
+        :svc,
+        {
+          sub_command: "status",
+          options: ["--remote-sup=#{remote_sup}"],
+          verbose: verbose
+        }, 
+        pkg
+      )
+      
+      !(statusout =~ /#{Regexp.quote(pkg)}/).nil?
+    end
+
+    def svc_unloaded?(pkg, opts = {})
+      svc_loaded?(pkg, opts) == false
+    end
+
+    def wait_for_svc_up(pkg, opts = {})
+      loop do
+        break if svc_loaded?(pkg, opts)
+
+        sleep 2
+      end
+    end
+
+    def wait_for_svc_down(pkg, opts = {})
+      loop do
+        break if svc_unloaded?(pkg, opts)
+
+        sleep 2
+      end
+    end
   end
 end

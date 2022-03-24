@@ -6,6 +6,7 @@ module Compose
           load_line = "Loading #{name.ljust(@name_offset)}  ... "
           print load_line
           options = defn.delete("load_args") || []
+          
           _exitcode, stdout, stderr = hab(
             :svc, 
             {
@@ -15,19 +16,9 @@ module Compose
             }, 
             defn["pkg"]
           )
-          statusout = ""
-          until statusout =~ /#{Regexp.quote(defn["pkg"])}/
-            _exitcode, statusout, statuserr = hab(
-              :svc, 
-              {
-                sub_command: "status",
-                options: ["--remote-sup=#{@remote_sup}"],
-                verbose: @verbose
-              }, 
-              defn["pkg"]
-            )
-            sleep 2
-          end
+          
+          wait_for_svc_up(defn["pkg"], remote_sup: @remote_sup, verbose: @verbose)
+          
           up_to_date = "\r#{name} is up-to-date"
           (load_line.size - up_to_date.size).times {|_| up_to_date.concat(" ") }
           print up_to_date + "\n" if stderr =~ /Service already loaded/
