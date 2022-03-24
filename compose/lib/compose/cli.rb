@@ -4,6 +4,7 @@ module Compose
   class CLI < Thor
     include Hab
     class_option :verbose, desc: "Show more output from command", required: false, type: :boolean
+    class_option :remote_sup, desc: "Address to a remote Supervisor's Control Gateway", required: false, type: :string, default: "127.0.0.1:9632"
     
     no_commands do
       def to_opts(service_name, options)
@@ -51,9 +52,11 @@ module Compose
       start.exec
     end
 
-    desc "status", "View supervisor status"
-    def status
-      hab_test("svc status")
+    option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
+    desc "status [SERVICE_NAME]", "View supervisor status"
+    def status(service_name = "")
+      status = Compose::Commands::Status.new(to_opts(service_name, options))
+      status.exec
     end
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"

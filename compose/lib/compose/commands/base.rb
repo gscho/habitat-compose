@@ -6,6 +6,9 @@ module Compose
 
       def initialize(opts = {})
         @service_name = opts["service_name"]
+        @remote_sup = opts["remote_sup"]
+        @verbose = opts["verbose"]
+        @name_offset = 5
         @yaml = load_compose_file(opts["file"])
       end
 
@@ -14,11 +17,11 @@ module Compose
       end
 
       def built_pkg_name(context)
-        last_build = File.read("#{context}/results/last_build.env")
-        last_build.split("\n").each do |line|
-          s = line.split("=")
-          return s[-1] if s[0].eql? "pkg_name"
-        end
+        pkg_ident = built_pkg_ident(context)
+        return unless pkg_ident
+
+        origin, name, version, release = pkg_ident.split("/")
+        origin.concat("/").concat(name)
       end
       
       def built_pkg_ident(context)
@@ -34,6 +37,7 @@ module Compose
           services.each do |name, defn|
             next unless @service_name.eql?("") || @service_name.eql?(name)
 
+            @name_offset = name.size if name.size > @name_offset
             if defn["build"]
               if defn["build"].is_a? String
                 defn["pkg"] = built_pkg_name(defn["build"])              
