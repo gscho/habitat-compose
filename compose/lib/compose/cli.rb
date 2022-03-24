@@ -41,8 +41,10 @@ module Compose
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
     desc "restart [SERVICE_NAME]", "Restart services"
     def restart(service_name = "")
-      restart = Compose::Commands::Restart.new(to_opts(service_name, options))
-      restart.exec
+      down = Compose::Commands::Down.new(to_opts(service_name, options))
+      down.exec
+      up = Compose::Commands::Up.new(to_opts(service_name, options))
+      up.exec
     end
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false, default: "habitat-compose.yml"
