@@ -1,0 +1,15 @@
+export HAB_STUDIO_SUP=false
+
+sup-run --listen-ctl=0.0.0.0:9632
+
+STATUS=1
+while [ ${STATUS} -ne 0 ]
+do
+  echo "Waiting for the habitat supervisor to start..."
+  sleep 2
+  hab svc status >/dev/null 2>&1
+  STATUS=$?
+done
+
+CTL_SECRET=$(cat /hab/sup/default/CTL_SECRET)
+echo "CTL_SECRET=${CTL_SECRET}"
