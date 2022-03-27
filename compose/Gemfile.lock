@@ -14,6 +14,7 @@ GEM
       timers (~> 4.1)
     console (1.14.0)
       fiber-local
+    dagwood (1.0.0)
     fiber-local (1.0.0)
     io-event (1.0.5)
     minitest (5.15.0)
@@ -48,6 +49,7 @@ PLATFORMS
 DEPENDENCIES
   async (~> 2.0)
   compose!
+  dagwood (~> 1.0)
   minitest (~> 5.0)
   paint (~> 2.2)
   posix-spawn (~> 0.3.15)

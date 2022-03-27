@@ -2,6 +2,7 @@ module Compose
   module Commands
     class Base
       include Hab
+      include ScreenOutput
       attr_accessor :yaml, :svcs, :pkg_builds
 
       def initialize(opts = {})
@@ -33,20 +34,31 @@ module Compose
       end
 
       def each_svc
-        @yaml["services"].tap do |services|
-          services.each do |name, defn|
-            next unless @service_name.eql?("") || @service_name.eql?(name)
+        services = {}
+        deps = {}
+        @yaml["services"].each do |name, defn|
+          defn["depends_on"] = [] unless defn["depends_on"]
 
-            @name_offset = name.size if name.size > @name_offset
-            if defn["build"]
-              if defn["build"].is_a? String
-                defn["pkg"] = built_pkg_name(defn["build"])              
-              else
-                defn["pkg"] = built_pkg_name(defn["build"]["plan_context"])
-              end
+          deps[name.to_sym] = defn["depends_on"].map(&:to_sym)
+        end
+
+        graph = Dagwood::DependencyGraph.new(deps)
+        graph.order.each do |k|
+          services[k.to_s] = @yaml["services"][k.to_s]
+        end
+
+        services.each do |name, defn|
+          next unless @service_name.eql?("") || @service_name.eql?(name) || deps[@service_name.to_sym].include?(name.to_sym)
+
+          @name_offset = name.size if name.size > @name_offset
+          if defn["build"]
+            if defn["build"].is_a? String
+              defn["pkg"] = built_pkg_name(defn["build"])              
+            else
+              defn["pkg"] = built_pkg_name(defn["build"]["plan_context"])
             end
-            yield(name, defn)
           end
+          yield(name, defn)
         end
       end
 
