@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "dagwood"
+require "file-tail"
 require "paint"
 require "posix-spawn"
 require "thor"
