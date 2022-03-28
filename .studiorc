@@ -12,4 +12,4 @@ do
 done
 
 CTL_SECRET=$(cat /hab/sup/default/CTL_SECRET)
-echo "CTL_SECRET=${CTL_SECRET}"
+echo "HAB_CTL_SECRET=${CTL_SECRET}"
