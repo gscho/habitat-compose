@@ -2,6 +2,7 @@
 
 require "dagwood"
 require "file-tail"
+require "logger"
 require "paint"
 require "posix-spawn"
 require "thor"
@@ -15,4 +16,5 @@ require_relative "compose/version"
 
 module Compose
   class Error < StandardError; end
+  Logger = Logger.new(STDOUT)
 end

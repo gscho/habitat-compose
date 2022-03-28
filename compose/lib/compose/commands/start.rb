@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Compose
   module Commands
     class Start < Base

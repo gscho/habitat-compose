@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Compose
   module Commands
     class Base
@@ -33,13 +35,15 @@ module Compose
         end
       end
 
-      def each_svc
+      def each_svc(opts = {})
+        include_deps = opts.delete(:include_deps) || false
         services = {}
         deps = {}
         @yaml["services"].each do |name, defn|
           defn["depends_on"] = [] unless defn["depends_on"]
 
           deps[name.to_sym] = defn["depends_on"].map(&:to_sym)
+          @name_offset = name.size if name.size > @name_offset
         end
 
         graph = Dagwood::DependencyGraph.new(deps)
@@ -48,9 +52,8 @@ module Compose
         end
 
         services.each do |name, defn|
-          next unless @service_name.eql?("") || @service_name.eql?(name) || deps[@service_name.to_sym].include?(name.to_sym)
+          next unless @service_name.eql?("") || @service_name.eql?(name) || (deps[@service_name.to_sym].include?(name.to_sym) && include_deps)
 
-          @name_offset = name.size if name.size > @name_offset
           if defn["build"]
             if defn["build"].is_a? String
               defn["pkg"] = built_pkg_name(defn["build"])              

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Compose
   module Hab
     @@hab_binary ||= ENV['PATH'].split(':')
@@ -19,7 +21,7 @@ module Compose
       argv << sub_command
       argv.concat(options) unless options.empty?
       argv.concat(args)
-      STDOUT.puts "Running command: '#{argv.join(" ")}'" if opts[:verbose]
+      Logger.debug "Running command: '#{argv.join(" ")}'" if opts[:verbose]
 
       process = POSIX::Spawn::Child.new(env, *(argv + [{ chdir: work_dir, timeout: timeout.to_i }]))
       status = process.status
@@ -52,6 +54,39 @@ module Compose
         pkg
       )
       wait_for_svc_up(pkg, remote_sup: remote_sup, verbose: verbose)
+      [_exitcode, stdout, stderr]
+    end
+
+    def hab_svc_unload(pkg, opts = {})
+      remote_sup = opts[:remote_sup] || "127.0.0.1:9632"
+      verbose = opts[:verbose] || false
+      options = []
+      _exitcode, stdout, stderr = hab(
+        :svc, 
+        {
+          sub_command: "unload",
+          options: options.append("--remote-sup=#{remote_sup}"),
+          verbose: verbose
+        }, 
+        pkg
+      )
+      wait_for_svc_down(pkg, remote_sup: remote_sup, verbose: verbose)
+      [_exitcode, stdout, stderr]
+    end
+
+    def hab_svc_status(opts = {})
+      remote_sup = opts[:remote_sup] || "127.0.0.1:9632"
+      verbose = opts[:verbose] || false
+      pkg = opts[:pkg] || nil
+      _exitcode, stdout, stderr = hab(
+        :svc,
+        {
+          sub_command: "status",
+          options: ["--remote-sup=#{remote_sup}"],
+          verbose: verbose
+        }, 
+        pkg
+      )
       [_exitcode, stdout, stderr]
     end
 
