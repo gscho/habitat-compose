@@ -1,5 +1,3 @@
-require "thor"
-
 module Compose
   class CLI < Thor
     include Hab
@@ -11,6 +9,36 @@ module Compose
         opts = options.dup
         opts["service_name"] = service_name
         opts
+      end
+
+      def tail_dash_f(filename)
+        open(filename) do |file|
+          puts file.read
+          case RUBY_PLATFORM   # string with OS name, like "amd64-freebsd8"
+          when /bsd/, /darwin/
+            require 'rb-kqueue'
+            queue = KQueue::Queue.new     
+            queue.watch_file(filename, :extend) do
+              yield file.read             
+            end
+            queue.run                     
+          when /linux/
+            require 'rb-inotify'
+            queue = INotify::Notifier.new  
+            queue.watch(filename, :modify) do
+              yield file.read             
+            end
+            queue.run                      
+          else
+            loop do           
+              changes = file.read
+              unless changes.empty?  
+                yield changes
+              end
+              sleep 1.0       
+            end
+          end
+        end
       end
     end
 
@@ -29,12 +57,19 @@ module Compose
     end
 
     option :follow, desc: "Follow log output", aliases: "-f", type: :boolean, default: false, required: false
-    desc "logs", "View supervisor logs"
-    def logs
+    desc "logs [SERVICE_NAME]", "View supervisor logs"
+    def logs(service_name = "")
       if options["follow"]
-        `tail -f /hab/sup/default/sup.log`
+        tail_dash_f("../default/sup.log") do |data|
+          print data
+          if data =~ /error/i
+            # do something else, for example send an email to administrator
+          end
+        end
       else
-        `cat /hab/sup/default/sup.log`
+        File.readlines("../default/sup.log").each do |line|
+          puts(line)
+        end
       end
     end
 

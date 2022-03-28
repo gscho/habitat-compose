@@ -16,3 +16,5 @@ gem "async", "~> 2.0"
 gem "paint", "~> 2.2"
 
 gem "dagwood", "~> 1.0"
+
+gem "rb-kqueue", "~> 0.2.8"

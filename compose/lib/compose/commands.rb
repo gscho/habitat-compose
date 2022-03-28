@@ -1,5 +1,3 @@
-require "yaml"
-
 require_relative "commands/base"
 require_relative "commands/build"
 require_relative "commands/down"

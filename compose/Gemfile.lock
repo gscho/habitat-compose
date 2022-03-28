@@ -15,6 +15,7 @@ GEM
     console (1.14.0)
       fiber-local
     dagwood (1.0.0)
+    ffi (1.15.5)
     fiber-local (1.0.0)
     io-event (1.0.5)
     minitest (5.15.0)
@@ -25,6 +26,8 @@ GEM
     posix-spawn (0.3.15)
     rainbow (3.1.1)
     rake (13.0.6)
+    rb-kqueue (0.2.8)
+      ffi (>= 0.5.0)
     regexp_parser (2.2.1)
     rexml (3.2.5)
     rubocop (1.25.1)
@@ -54,6 +57,7 @@ DEPENDENCIES
   paint (~> 2.2)
   posix-spawn (~> 0.3.15)
   rake (~> 13.0)
+  rb-kqueue (~> 0.2.8)
   rubocop (~> 1.21)
 
 BUNDLED WITH

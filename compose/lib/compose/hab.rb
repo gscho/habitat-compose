@@ -1,5 +1,3 @@
-require "posix-spawn"
-
 module Compose
   module Hab
     @@hab_binary ||= ENV['PATH'].split(':')
@@ -38,6 +36,23 @@ module Compose
       # else
         puts "#{@@hab_binary} #{cmd} #{opts} #{arg}".squeeze(" ")
       # end
+    end
+
+    def hab_svc_load(pkg, opts = {})
+      remote_sup = opts[:remote_sup] || "127.0.0.1:9632"
+      verbose = opts[:verbose] || false
+      load_args = opts[:load_args] || []
+      _exitcode, stdout, stderr = hab(
+        :svc,
+        {
+          sub_command: "load",
+          options: load_args.append("--remote-sup=#{remote_sup}"),
+          verbose: verbose
+        }, 
+        pkg
+      )
+      wait_for_svc_up(pkg, remote_sup: remote_sup, verbose: verbose)
+      [_exitcode, stdout, stderr]
     end
 
     def svc_loaded?(pkg, opts = {})

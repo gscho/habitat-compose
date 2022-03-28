@@ -2,4 +2,10 @@
 
 require "compose"
 
+trap("SIGINT") do 
+  STDOUT.puts
+  STDOUT.puts "received interrupt."
+  exit(255)
+end
+
 Compose::CLI.start(ARGV)
