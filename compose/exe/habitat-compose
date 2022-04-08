@@ -2,7 +2,7 @@
 
 require "compose"
 
-trap("SIGINT") do 
+trap("SIGINT") do
   STDOUT.puts
   STDOUT.puts "received interrupt."
   exit(255)
