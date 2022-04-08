@@ -7,7 +7,7 @@ module Compose
         if @service_name.empty?
           _exitcode, stdout, stderr = hab_svc_status(remote_sup: @remote_sup, verbose: @verbose)
         else
-          each_svc do |name, defn|
+          each_svc do |_name, defn|
             _exitcode, stdout, stderr = hab_svc_status(pkg: defn["pkg"], remote_sup: @remote_sup, verbose: @verbose)
           end
         end
