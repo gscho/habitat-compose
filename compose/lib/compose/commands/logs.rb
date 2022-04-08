@@ -11,15 +11,16 @@ module Compose
                       else
                         opts["tail"].to_i
                       end
+        @log_file = opts["log_file"]
       end
 
       def exec
         if @follow
-          File.open("../default/sup.log") do |log|
+          File.open(@log_file) do |log|
             log.extend(File::Tail)
             log.interval
             log.backward(@tail_lines) if @tail_lines
-            log.tail do |line| 
+            log.tail do |line|
               if @service_name.empty?
                 print line
               elsif line =~ /#{@service_name}\./i
@@ -28,8 +29,12 @@ module Compose
             end
           end
         else
-          File.readlines("../default/sup.log").each do |line|
-            STDOUT.puts(line)
+          File.readlines(@log_file).each do |line|
+            if @service_name.empty?
+              print line
+            elsif line =~ /#{@service_name}\./i
+              print line
+            end
           end
         end
       end
