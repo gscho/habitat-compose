@@ -10,6 +10,3 @@ do
   hab svc status >/dev/null 2>&1
   STATUS=$?
 done
-
-CTL_SECRET=$(cat /hab/sup/default/CTL_SECRET)
-echo "HAB_CTL_SECRET=${CTL_SECRET}"
