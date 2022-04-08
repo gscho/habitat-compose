@@ -26,7 +26,7 @@ module Compose
         origin, name, version, release = pkg_ident.split("/")
         origin.concat("/").concat(name)
       end
-      
+
       def built_pkg_ident(context)
         last_build = File.read("#{context}/results/last_build.env")
         last_build.split("\n").each do |line|
@@ -52,14 +52,16 @@ module Compose
         end
 
         services.each do |name, defn|
-          next unless @service_name.eql?("") || @service_name.eql?(name) || (deps[@service_name.to_sym].include?(name.to_sym) && include_deps)
+          unless @service_name.eql?("") || @service_name.eql?(name) || (deps[@service_name.to_sym] && deps[@service_name.to_sym].include?(name.to_sym) && include_deps)
+            next
+          end
 
           if defn["build"]
-            if defn["build"].is_a? String
-              defn["pkg"] = built_pkg_name(defn["build"])              
-            else
-              defn["pkg"] = built_pkg_name(defn["build"]["plan_context"])
-            end
+            defn["pkg"] = if defn["build"].is_a? String
+                            built_pkg_name(defn["build"])
+                          else
+                            built_pkg_name(defn["build"]["plan_context"])
+                          end
           end
           yield(name, defn)
         end
