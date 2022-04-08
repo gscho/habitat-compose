@@ -5,7 +5,9 @@ module Compose
     class Stop < Base
       def exec
         each_svc do |name, defn|
-          hab_test("svc stop", nil, defn["pkg"])
+          print_stoping(name, @name_offset) do
+            hab_svc_stop(defn["pkg"], remote_sup: @remote_sup, verbose: @verbose)
+          end
         end
       end
     end
