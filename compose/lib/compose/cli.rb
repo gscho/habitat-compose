@@ -88,13 +88,23 @@ module Compose
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false,
                   default: "habitat-compose.yml"
-    option :build, desc: "Build packages before loading them", required: false, type: :boolean
+    option :build, desc: "Build packages before loading them", required: false, type: :boolean, default: false
+    option :config, desc: "Configure packages after loading them", required: false, type: :boolean, default: true
     desc "up [SERVICE_NAME]", "Load services"
     def up(service_name = "")
       build(service_name) if options["build"]
 
       up = Compose::Commands::Up.new(to_opts(service_name, options))
       up.exec
+      config(service_name, true) if options["config"]
+    end
+
+    option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false,
+                  default: "habitat-compose.yml"
+    desc "config [SERVICE_NAME]", "Sets a service configuration"
+    def config(service_name = "", deps = false)
+      config = Compose::Commands::Config.new(to_opts(service_name, options))
+      config.exec(deps)
     end
 
     desc "verison", "Display version information"

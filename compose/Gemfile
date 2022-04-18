@@ -18,3 +18,5 @@ gem "dagwood", "~> 1.0"
 gem "rb-kqueue", "~> 0.2.8"
 
 gem "file-tail", "~> 1.2"
+
+gem "tomlrb", "~> 2.0"

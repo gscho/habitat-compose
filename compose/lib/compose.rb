@@ -3,9 +3,11 @@
 require "dagwood"
 require "file-tail"
 require "logger"
+require "open3"
 require "paint"
 require "posix-spawn"
 require "thor"
+require "tomlrb"
 require "yaml"
 
 require_relative "compose/hab"

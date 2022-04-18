@@ -23,8 +23,7 @@ module Compose
         pkg_ident = built_pkg_ident(context)
         return unless pkg_ident
 
-        origin, name, version, release = pkg_ident.split("/")
-        origin.concat("/").concat(name)
+        pkg_ident
       end
 
       def built_pkg_ident(context)
@@ -33,6 +32,10 @@ module Compose
           s = line.split("=")
           return s[-1] if s[0].eql? "pkg_ident"
         end
+      end
+
+      def validate_toml(toml)
+        Tomlrb.parse(toml)
       end
 
       def each_svc(opts = {})
