@@ -40,9 +40,8 @@ module Compose
 
       def each_svc(opts = {})
         include_deps = opts.delete(:include_deps) || false
-        services = ordered_services
         deps = service_deps
-        services.each do |name, defn|
+        ordered_services(deps).each do |name, defn|
           next unless service_name_match?(name) || (include_deps && service_dep?(deps, name))
 
           defn["pkg"] = get_built_pkg_name(defn) if defn["build"]
@@ -61,12 +60,13 @@ module Compose
         deps
       end
 
-      def ordered_servides
+      def ordered_services(deps)
         services = {}
         graph = Dagwood::DependencyGraph.new(deps)
         graph.order.each do |k|
           services[k.to_s] = @yaml["services"][k.to_s]
         end
+        services
       end
 
       def service_name_match?(current)
@@ -78,7 +78,7 @@ module Compose
       end
 
       def get_built_pkg_name(defn)
-        context = defn["build"].is_a? String ? defn["build"] : defn["build"]["plan_context"]
+        context = defn["build"].is_a?(String) ? defn["build"] : defn["build"]["plan_context"]
         built_pkg_name(context)
       end
 

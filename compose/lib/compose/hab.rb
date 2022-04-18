@@ -21,8 +21,10 @@ module Compose
       [status.exitstatus, process.out, process.err]
     end
 
-    def prepare_cmd(cmd, opts = {}, *kwargs)
-      args = prep_args(kwargs)
+    # rubocop:disable Metrics/AbcSize
+    def prepare_cmd(cmd, opts = {}, *args)
+      args = args.first if args.size == 1 && args[0].is_a?(Array)
+      args = args.map(&:to_s).reject(&:empty?)
       options = opts.delete(:options) || []
       sub_command = opts.delete(:sub_command)
       argv = []
@@ -32,14 +34,7 @@ module Compose
       argv.concat(options) unless options.empty?
       argv.concat(args)
     end
-
-    def prep_args(*args)
-      if args.size == 1 && args[0].is_a?(Array)
-        args.first
-      else
-        args.map(&:to_s).reject(&:empty?)
-      end
-    end
+    # rubocop:enable Metrics/AbcSize
 
     def default_opts(opts)
       remote_sup = opts[:remote_sup] || "127.0.0.1:9632"
@@ -121,7 +116,7 @@ module Compose
       [exitcode, stdout, stderr]
     end
 
-    def hab_svc_unload(pkg, _opts = {})
+    def hab_svc_unload(pkg, opts = {})
       remote_sup, verbose = default_opts(opts)
       options = []
       exitcode, stdout, stderr = hab(
@@ -193,7 +188,7 @@ module Compose
       end
     end
 
-    def svc_loaded?(pkg, _opts = {})
+    def svc_loaded?(pkg, opts = {})
       remote_sup, verbose = default_opts(opts)
       _exitcode, stdout, _stderr = hab(
         :svc,
@@ -208,7 +203,7 @@ module Compose
       !(stdout =~ /#{Regexp.quote(pkg)}/).nil?
     end
 
-    def svc_up?(pkg, _opts = {})
+    def svc_up?(pkg, opts = {})
       remote_sup, verbose = default_opts(opts)
       _exitcode, stdout, _stderr = hab(
         :svc,
@@ -227,7 +222,7 @@ module Compose
       svc_loaded?(pkg, opts) == false
     end
 
-    def svc_down?(pkg, _opts = {})
+    def svc_down?(pkg, opts = {})
       remote_sup, verbose = default_opts(opts)
       _exitcode, stdout, _stderr = hab(
         :svc,
