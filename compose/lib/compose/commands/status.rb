@@ -11,7 +11,7 @@ module Compose
             _exitcode, stdout, stderr = hab_svc_status(pkg: defn["pkg"], remote_sup: @remote_sup, verbose: @verbose)
           end
         end
-        STDOUT.puts stdout
+        $stdout.puts stdout
       end
     end
   end

@@ -34,7 +34,7 @@ module Compose
     option :follow, desc: "Follow log output", aliases: "-f", type: :boolean, default: false, required: false
     option :tail, desc: "Number of lines to show from the end of the logs for each service", aliases: "-t",
                   type: :string, default: "all", required: false
-    option :log_file, desc: "Path to the supervisor log file", aliases: "-l", type: :string, 
+    option :log_file, desc: "Path to the supervisor log file", aliases: "-l", type: :string,
                       default: "/hab/sup/default/sup.log", required: false
     desc "logs [SERVICE_NAME]", "View supervisor logs"
     def logs(service_name = "")
@@ -96,20 +96,20 @@ module Compose
 
       up = Compose::Commands::Up.new(to_opts(service_name, options))
       up.exec
-      config(service_name, true) if options["config"]
+      config(service_name, deps: true) if options["config"]
     end
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false,
                   default: "habitat-compose.yml"
     desc "config [SERVICE_NAME]", "Configure services"
-    def config(service_name = "", deps = false)
+    def config(service_name = "", deps: false)
       config = Compose::Commands::Config.new(to_opts(service_name, options))
       config.exec(deps)
     end
 
     desc "verison", "Display version information"
     def version
-      STDOUT.puts Compose::VERSION
+      $stdout.puts Compose::VERSION
     end
   end
 end

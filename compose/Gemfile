@@ -10,7 +10,6 @@ gem "rubocop", "~> 1.21"
 
 gem "posix-spawn", "~> 0.3.15"
 
-
 gem "paint", "~> 2.2"
 
 gem "dagwood", "~> 1.0"

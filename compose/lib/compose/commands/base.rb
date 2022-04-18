@@ -40,7 +40,17 @@ module Compose
 
       def each_svc(opts = {})
         include_deps = opts.delete(:include_deps) || false
-        services = {}
+        services = ordered_services
+        deps = service_deps
+        services.each do |name, defn|
+          next unless service_name_match?(name) || (include_deps && service_dep?(deps, name))
+
+          defn["pkg"] = get_built_pkg_name(defn) if defn["build"]
+          yield(name, defn)
+        end
+      end
+
+      def service_deps
         deps = {}
         @yaml["services"].each do |name, defn|
           defn["depends_on"] = [] unless defn["depends_on"]
@@ -48,26 +58,28 @@ module Compose
           deps[name.to_sym] = defn["depends_on"].map(&:to_sym)
           @name_offset = name.size if name.size > @name_offset
         end
+        deps
+      end
 
+      def ordered_servides
+        services = {}
         graph = Dagwood::DependencyGraph.new(deps)
         graph.order.each do |k|
           services[k.to_s] = @yaml["services"][k.to_s]
         end
+      end
 
-        services.each do |name, defn|
-          unless @service_name.eql?("") || @service_name.eql?(name) || (deps[@service_name.to_sym] && deps[@service_name.to_sym].include?(name.to_sym) && include_deps)
-            next
-          end
+      def service_name_match?(current)
+        @service_name.eql?("") || @service_name.eql?(current)
+      end
 
-          if defn["build"]
-            defn["pkg"] = if defn["build"].is_a? String
-                            built_pkg_name(defn["build"])
-                          else
-                            built_pkg_name(defn["build"]["plan_context"])
-                          end
-          end
-          yield(name, defn)
-        end
+      def service_dep?(deps, current)
+        deps[@service_name.to_sym]&.include?(current.to_sym)
+      end
+
+      def get_built_pkg_name(defn)
+        context = defn["build"].is_a? String ? defn["build"] : defn["build"]["plan_context"]
+        built_pkg_name(context)
       end
 
       def each_pkg_build
@@ -78,7 +90,7 @@ module Compose
             if defn["build"]
               yield(name, defn)
             elsif @service_name.eql?(name)
-              STDOUT.puts "#{@service_name} uses a pre-built pkg, skipping"
+              $stdout.puts "#{@service_name} uses a pre-built pkg, skipping"
             end
           end
         end

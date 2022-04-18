@@ -15,28 +15,28 @@ module Compose
       end
 
       def exec
-        if @follow
-          File.open(@log_file) do |log|
-            log.extend(File::Tail)
-            log.interval
-            log.backward(@tail_lines) if @tail_lines
-            log.tail do |line|
-              if @service_name.empty?
-                print line
-              elsif line =~ /#{@service_name}\./i
-                print line
-              end
-            end
-          end
-        else
-          File.readlines(@log_file).each do |line|
-            if @service_name.empty?
-              print line
-            elsif line =~ /#{@service_name}\./i
-              print line
-            end
+        @follow ? follow_log : dump_log
+      end
+
+      def follow_log
+        File.open(@log_file) do |log|
+          log.extend(File::Tail)
+          log.interval
+          log.backward(@tail_lines) if @tail_lines
+          log.tail do |line|
+            print_log_line(line)
           end
         end
+      end
+
+      def dump_log
+        File.readlines(@log_file).each do |line|
+          print_log_line(line)
+        end
+      end
+
+      def print_log_line(line)
+        print line if @service_name.empty? || line =~ /#{@service_name}\./i
       end
     end
   end

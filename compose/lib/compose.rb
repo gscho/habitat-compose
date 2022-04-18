@@ -18,5 +18,5 @@ require_relative "compose/version"
 
 module Compose
   class Error < StandardError; end
-  Logger = Logger.new(STDOUT)
+  Logger = Logger.new($stdout)
 end

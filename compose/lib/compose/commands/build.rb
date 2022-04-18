@@ -4,7 +4,7 @@ module Compose
   module Commands
     class Build < Base
       def exec
-        each_pkg_build do |name, defn|
+        each_pkg_build do |_name, defn|
           plan_context = if defn["build"].is_a? String
                            defn["build"]
                          else
