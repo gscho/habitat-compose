@@ -101,7 +101,7 @@ module Compose
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false,
                   default: "habitat-compose.yml"
-    desc "config [SERVICE_NAME]", "Sets a service configuration"
+    desc "config [SERVICE_NAME]", "Configure services"
     def config(service_name = "", deps = false)
       config = Compose::Commands::Config.new(to_opts(service_name, options))
       config.exec(deps)
