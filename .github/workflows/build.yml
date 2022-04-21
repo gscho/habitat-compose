@@ -22,4 +22,4 @@ jobs:
         bundler: '2.3.3'
         working-directory: compose
     - name: Run lint and unit tests
-      run: bundle exec rake
+      run: cd compose && bundle exec rake
