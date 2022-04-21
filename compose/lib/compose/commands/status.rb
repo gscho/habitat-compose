@@ -5,10 +5,10 @@ module Compose
     class Status < Base
       def exec
         if @service_name.empty?
-          _exitcode, stdout, stderr = hab_svc_status(remote_sup: @remote_sup, verbose: @verbose)
+          _exitcode, stdout, _stderr = hab_svc_status(remote_sup: @remote_sup, verbose: @verbose)
         else
           each_svc do |_name, defn|
-            _exitcode, stdout, stderr = hab_svc_status(pkg: defn["pkg"], remote_sup: @remote_sup, verbose: @verbose)
+            _exitcode, stdout, _stderr = hab_svc_status(pkg: defn["pkg"], remote_sup: @remote_sup, verbose: @verbose)
           end
         end
         $stdout.puts stdout

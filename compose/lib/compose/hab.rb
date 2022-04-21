@@ -21,20 +21,19 @@ module Compose
       [status.exitstatus, process.out, process.err]
     end
 
-    # rubocop:disable Metrics/AbcSize
     def prepare_cmd(cmd, opts = {}, *args)
       args = args.first if args.size == 1 && args[0].is_a?(Array)
-      args = args.map(&:to_s).reject(&:empty?)
+      args = args.map(&:to_s)
       options = opts.delete(:options) || []
-      sub_command = opts.delete(:sub_command)
+      sub_command = opts.delete(:sub_command) || ""
       argv = []
       argv << @@hab_binary
       argv << cmd.to_s
       argv << sub_command
-      argv.concat(options) unless options.empty?
+      argv.concat(options)
       argv.concat(args)
+      argv.reject(&:empty?)
     end
-    # rubocop:enable Metrics/AbcSize
 
     def default_opts(opts)
       remote_sup = opts[:remote_sup] || "127.0.0.1:9632"
@@ -77,7 +76,7 @@ module Compose
         :pkg,
         {
           sub_command: "build",
-          options: {},
+          options: [],
           work_dir: work_dir
         },
         "."
@@ -186,6 +185,7 @@ module Compose
       load_args.each do |arg|
         return arg.split("=")[-1] if arg.start_with?("--group")
       end
+      "default"
     end
 
     def svc_loaded?(pkg, opts = {})

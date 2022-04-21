@@ -104,7 +104,7 @@ module Compose
     desc "config [SERVICE_NAME]", "Configure services"
     def config(service_name = "", deps: false)
       config = Compose::Commands::Config.new(to_opts(service_name, options))
-      config.exec(deps)
+      config.exec(deps: deps)
     end
 
     desc "verison", "Display version information"

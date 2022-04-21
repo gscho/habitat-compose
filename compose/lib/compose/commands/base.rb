@@ -5,7 +5,6 @@ module Compose
     class Base
       include Hab
       include ScreenOutput
-      attr_accessor :yaml, :svcs, :pkg_builds
 
       def initialize(opts = {})
         @service_name = opts["service_name"]
@@ -13,20 +12,18 @@ module Compose
         @verbose = opts["verbose"]
         @name_offset = 5
         @yaml = load_compose_file(opts["file"])
+        @deps = service_deps
+        @ordered_services = order_services
       end
 
       def load_compose_file(path)
         YAML.load_file(path)
       end
 
-      def built_pkg_name(context)
-        pkg_ident = built_pkg_ident(context)
-        return unless pkg_ident
-
-        pkg_ident
-      end
-
       def built_pkg_ident(context)
+        if context.is_a?(Hash)
+          context = context["build"].is_a?(String) ? context["build"] : context["build"]["plan_context"]
+        end
         last_build = File.read("#{context}/results/last_build.env")
         last_build.split("\n").each do |line|
           s = line.split("=")
@@ -36,16 +33,19 @@ module Compose
 
       def validate_toml(toml)
         Tomlrb.parse(toml)
+      rescue Tomlrb::ParseError
+        print "\n"
+        $stdout.puts "Error parsing the toml:"
+        $stdout.puts toml
+        raise
       end
 
-      def each_svc(opts = {})
-        include_deps = opts.delete(:include_deps) || false
-        deps = service_deps
-        ordered_services(deps).each do |name, defn|
-          next unless service_name_match?(name) || (include_deps && service_dep?(deps, name))
+      def each_svc(include_deps: false)
+        @ordered_services.each do |name, defn|
+          next unless service_name_match?(name) || (include_deps && service_dep?(name))
 
-          defn["pkg"] = get_built_pkg_name(defn) if defn["build"]
-          yield(name, defn)
+          defn["pkg"] = built_pkg_ident(defn) if defn["build"]
+          yield(name, defn) if block_given?
         end
       end
 
@@ -60,9 +60,9 @@ module Compose
         deps
       end
 
-      def ordered_services(deps)
+      def order_services
         services = {}
-        graph = Dagwood::DependencyGraph.new(deps)
+        graph = Dagwood::DependencyGraph.new(@deps)
         graph.order.each do |k|
           services[k.to_s] = @yaml["services"][k.to_s]
         end
@@ -73,22 +73,17 @@ module Compose
         @service_name.eql?("") || @service_name.eql?(current)
       end
 
-      def service_dep?(deps, current)
-        deps[@service_name.to_sym]&.include?(current.to_sym)
-      end
-
-      def get_built_pkg_name(defn)
-        context = defn["build"].is_a?(String) ? defn["build"] : defn["build"]["plan_context"]
-        built_pkg_name(context)
+      def service_dep?(current)
+        @deps[@service_name.to_sym]&.include?(current.to_sym)
       end
 
       def each_pkg_build
         @yaml["services"].tap do |services|
           services.each do |name, defn|
-            next unless @service_name.eql?("") || @service_name.eql?(name)
+            next unless service_name_match?(name)
 
             if defn["build"]
-              yield(name, defn)
+              yield(name, defn) if block_given?
             elsif @service_name.eql?(name)
               $stdout.puts "#{@service_name} uses a pre-built pkg, skipping"
             end
