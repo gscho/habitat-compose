@@ -1,7 +1,7 @@
 services:
   webapp:
     build: 
-      plan_context: ../../simple-go-app
+      plan_context: test/fixtures
     depends_on:
     - db
     - redis
