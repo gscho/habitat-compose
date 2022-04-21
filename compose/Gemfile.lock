@@ -2,14 +2,21 @@ PATH
   remote: .
   specs:
     compose (0.1.0)
-      thor
+      dagwood (~> 1.0)
+      file-tail (~> 1.2)
+      minitest (~> 5.0)
+      paint (~> 2.2)
+      posix-spawn (~> 0.3.15)
+      rake (~> 13.0)
+      rubocop (~> 1.21)
+      thor (~> 1.2)
+      tomlrb (~> 2.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.2)
     dagwood (1.0.0)
-    ffi (1.15.5)
     file-tail (1.2.0)
       tins (~> 1.0)
     minitest (5.15.0)
@@ -20,8 +27,6 @@ GEM
     posix-spawn (0.3.15)
     rainbow (3.1.1)
     rake (13.0.6)
-    rb-kqueue (0.2.8)
-      ffi (>= 0.5.0)
     regexp_parser (2.2.1)
     rexml (3.2.5)
     rubocop (1.25.1)
@@ -45,18 +50,10 @@ GEM
 
 PLATFORMS
   x86_64-darwin-21
+  x86_64-linux
 
 DEPENDENCIES
   compose!
-  dagwood (~> 1.0)
-  file-tail (~> 1.2)
-  minitest (~> 5.0)
-  paint (~> 2.2)
-  posix-spawn (~> 0.3.15)
-  rake (~> 13.0)
-  rb-kqueue (~> 0.2.8)
-  rubocop (~> 1.21)
-  tomlrb (~> 2.0)
 
 BUNDLED WITH
    2.3.3
