@@ -20,5 +20,6 @@ jobs:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true
         bundler: '2.3.3'
+        working-directory: compose
     - name: Run lint and unit tests
-      run: cd compose && bundle exec rake
+      run: bundle exec rake
