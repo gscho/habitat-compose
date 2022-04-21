@@ -10,3 +10,4 @@ habitat-compose.yml
 test.rb
 results/
 default/
+*.gem
