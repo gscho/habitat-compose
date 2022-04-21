@@ -22,4 +22,7 @@ jobs:
         bundler: '2.3.3'
         working-directory: compose
     - name: Run lint and unit tests
-      run: cd compose && bundle exec rake
+      run: |
+        touch /usr/local/bin/hab
+        cd compose
+        bundle exec rake

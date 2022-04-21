@@ -22,7 +22,6 @@ module Compose
     end
 
     # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/CyclomaticComplexity
     def prepare_cmd(cmd, opts = {}, *args)
       args = args.first if args.size == 1 && args[0].is_a?(Array)
       args = args.map(&:to_s)
@@ -32,13 +31,12 @@ module Compose
       argv << @@hab_binary
       argv << cmd.to_s
       argv << sub_command
-      argv.concat(options) unless options.empty?
+      argv.concat(options)
       argv.concat(args)
-      argv.reject(&:empty?)
+      argv.reject { |a| a.to_s.empty? }
     end
-    # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/CyclomaticComplexity
 
+    # rubocop:enable Metrics/AbcSize
     def default_opts(opts)
       remote_sup = opts[:remote_sup] || "127.0.0.1:9632"
       verbose = opts[:verbose] || false
