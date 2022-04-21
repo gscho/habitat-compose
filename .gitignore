@@ -7,7 +7,9 @@
 /spec/reports/
 /tmp/
 habitat-compose.yml
+!compose/test/fixtures/habitat-compose.yml
 test.rb
 results/
+!compose/test/fixtures/results
 default/
 *.gem

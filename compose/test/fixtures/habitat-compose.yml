@@ -1,0 +1,22 @@
+services:
+  webapp:
+    build: 
+      plan_context: ../../simple-go-app
+    depends_on:
+    - db
+    - redis
+    load_args:
+    - "--group=test"
+    config_toml: |
+      port = 8082
+  redis:
+    pkg: core/redis
+    load_args:
+    - "--channel=unstable"
+    - "--group=redis"
+    config_toml: |
+      port = 6380
+  db:
+    pkg: core/postgresql
+    depends_on:
+    - redis
