@@ -3,19 +3,3 @@
 source "https://rubygems.org"
 
 gemspec
-
-gem "minitest", "~> 5.0"
-gem "rake", "~> 13.0"
-gem "rubocop", "~> 1.21"
-
-gem "posix-spawn", "~> 0.3.15"
-
-gem "paint", "~> 2.2"
-
-gem "dagwood", "~> 1.0"
-
-gem "rb-kqueue", "~> 0.2.8"
-
-gem "file-tail", "~> 1.2"
-
-gem "tomlrb", "~> 2.0"
