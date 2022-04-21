@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    branches: [ release ]
+
+jobs:
+  pre-release-checks:
+    runs-on: ubuntu-latest
+    if: |
+      !contains(github.event.pull_request.body, '[skip changelog]') &&
+      !contains(github.event.pull_request.body, '[changelog skip]') &&
+      !contains(github.event.pull_request.body, '[skip ci]') &&
+      !contains(github.event.pull_request.labels.*.name, 'skip changelog')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Fetch origin
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth 1
+      - name: Check that CHANGELOG.md is touched
+        run: |
+          git diff remotes/origin/${{ github.base_ref }} --name-only | grep CHANGELOG.md
+      - name: Check that compose/lib/compose/version.rb is touched
+        run: |
+          git diff remotes/origin/${{ github.base_ref }} --name-only | grep version.rb
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get version
+        id: vars
+        run: echo "::set-output name=version::$(ruby ruby -I compose/lib -e "require 'compose/version'; p Compose::VERSION")"
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.vars.outputs.version }}
+      - name: Build and upload hab pkg
+        env:
+          HAB_LICENSE: "accept"
+          HAB_AUTH_TOKEN: "${{ secrets.HAB_AUTH_TOKEN }}"
+        run: |
+          curl https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | sudo bash
+          hab origin key download
+          hab origin key download --secret
+          hab pkg build .
+          source results/last_build.env
+          hab pkg upload "results/$pkg_artifact"
+
