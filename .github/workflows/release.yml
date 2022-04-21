@@ -25,11 +25,12 @@ jobs:
           git diff remotes/origin/${{ github.base_ref }} --name-only | grep version.rb
   release:
     runs-on: ubuntu-latest
+    needs: pre-release-checks
     steps:
       - uses: actions/checkout@v2
       - name: Get version
         id: vars
-        run: echo "::set-output name=version::$(ruby ruby -I compose/lib -e "require 'compose/version'; p Compose::VERSION")"
+        run: echo "::set-output name=version::$(ruby -I compose/lib -e "require 'compose/version'; p Compose::VERSION")"
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
