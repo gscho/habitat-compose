@@ -84,8 +84,8 @@ module Compose
 
             if defn["build"]
               yield(name, defn) if block_given?
-            elsif @service_name.eql?(name)
-              $stdout.puts "#{@service_name} uses a pre-built pkg, skipping"
+            elsif service_name_match?(name)
+              $stdout.puts "#{name} uses a pre-built pkg, skipping"
             end
           end
         end
