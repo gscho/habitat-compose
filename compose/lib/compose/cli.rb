@@ -88,7 +88,7 @@ module Compose
 
     option :file, desc: "Specify an alternate compose file", aliases: "-f", required: false,
                   default: "habitat-compose.yml"
-    option :build, desc: "Build packages before loading them", required: false, type: :boolean, default: false
+    option :build, desc: "Build packages before loading them", required: false, type: :boolean, default: true
     option :config, desc: "Configure packages after loading them", required: false, type: :boolean, default: true
     desc "up [SERVICE_NAME]", "Load services"
     def up(service_name = "")
