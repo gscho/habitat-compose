@@ -43,8 +43,8 @@ jobs:
           HAB_AUTH_TOKEN: "${{ secrets.HAB_AUTH_TOKEN }}"
         run: |
           curl https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | sudo bash
-          hab origin key download
-          hab origin key download --secret
+          hab origin key download gscho
+          hab origin key download --secret gscho
           hab pkg build .
           source results/last_build.env
           hab pkg upload "results/$pkg_artifact"
