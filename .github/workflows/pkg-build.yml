@@ -8,6 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Cache hab pkgs
+        id: cache-pkgs
+        uses: actions/cache@v3
+        with:
+          path: /hab/pkgs/core
+          key: ${{ runner.os }}-pkgs
       - name: Get version
         id: vars
         run: echo "::set-output name=version::$(ruby -I compose/lib -e "require 'compose/version'; puts Compose::VERSION")"
@@ -15,6 +21,7 @@ jobs:
         env:
           HAB_LICENSE: "accept"
           HAB_AUTH_TOKEN: "${{ secrets.HAB_AUTH_TOKEN }}"
+          HAB_ORIGIN: "gscho"
         run: |
           curl https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | sudo bash
           sudo -E hab origin key download gscho
