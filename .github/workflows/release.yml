@@ -2,8 +2,8 @@ name: Release
 
 on:
   pull_request:
-    branches: [ release ]
-    types: [opened, reopened, synchronize, closed]
+    branches: [ releases/** ]
+    types: [ opened, reopened, synchronize, closed ]
 
 jobs:
   pre-release-checks:
@@ -26,26 +26,32 @@ jobs:
           git diff remotes/origin/${{ github.base_ref }} --name-only | grep version.rb
   release:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v2
       - name: Get version
         id: vars
         run: echo "::set-output name=version::$(ruby -I compose/lib -e "require 'compose/version'; puts Compose::VERSION")"
+      - name: Cache hab pkgs
+        id: cache-pkgs
+        uses: actions/cache@v3
+        with:
+          path: /hab/pkgs/core
+          key: ${{ runner.os }}-pkgs
+      - name: Build and upload hab pkg
+        env:
+          HAB_LICENSE: "accept"
+          HAB_AUTH_TOKEN: "${{ secrets.HAB_AUTH_TOKEN }}"
+          HAB_ORIGIN: "gscho"
+        run: |
+          curl https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | sudo bash
+          sudo -E hab origin key download gscho
+          sudo -E hab origin key download --secret gscho
+          sudo -E hab pkg build .
+          source results/last_build.env
+          sudo -E hab pkg upload "results/$pkg_artifact"
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.vars.outputs.version }}
-      - name: Build and upload hab pkg
-        env:
-          HAB_LICENSE: "accept"
-          HAB_AUTH_TOKEN: "${{ secrets.HAB_AUTH_TOKEN }}"
-        run: |
-          curl https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | sudo bash
-          hab origin key download gscho
-          hab origin key download --secret gscho
-          hab pkg build .
-          source results/last_build.env
-          hab pkg upload "results/$pkg_artifact"
 
