@@ -1,0 +1,7 @@
+services:
+  grafana:
+    pkg: core/grafana
+    load_args:
+    - "--bind=prom:prometheus.default"
+  prom:
+    pkg: core/prometheus

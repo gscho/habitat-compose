@@ -1,8 +1,9 @@
 name: Release
 
 on:
-  push:
+  pull_request:
     branches: [ release ]
+    types: [opened, reopened, synchronize, closed]
 
 jobs:
   pre-release-checks:
@@ -25,11 +26,12 @@ jobs:
           git diff remotes/origin/${{ github.base_ref }} --name-only | grep version.rb
   release:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v2
       - name: Get version
         id: vars
-        run: echo "::set-output name=version::$(ruby ruby -I compose/lib -e "require 'compose/version'; p Compose::VERSION")"
+        run: echo "::set-output name=version::$(ruby -I compose/lib -e "require 'compose/version'; p Compose::VERSION")"
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
