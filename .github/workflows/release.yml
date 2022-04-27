@@ -34,4 +34,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.vars.outputs.version }}
+          generateReleaseNotes: true
 
