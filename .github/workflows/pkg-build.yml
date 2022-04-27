@@ -1,0 +1,26 @@
+name: Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  hab-pkg-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get version
+        id: vars
+        run: echo "::set-output name=version::$(ruby -I compose/lib -e "require 'compose/version'; puts Compose::VERSION")"
+      - name: Build and upload hab pkg
+        env:
+          HAB_LICENSE: "accept"
+          HAB_AUTH_TOKEN: "${{ secrets.HAB_AUTH_TOKEN }}"
+        run: |
+          curl https://raw.githubusercontent.com/habitat-sh/habitat/main/components/hab/install.sh | sudo bash
+          hab origin key download gscho
+          hab origin key download --secret gscho
+          hab pkg build .
+          source results/last_build.env
+          hab pkg upload "results/$pkg_artifact"
+
+
