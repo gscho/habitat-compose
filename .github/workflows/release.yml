@@ -1,29 +1,9 @@
 name: Release
 
 on:
-  pull_request:
-    branches: [ releases/** ]
-    types: [ opened, reopened, synchronize, closed ]
+  workflow_dispatch:
 
 jobs:
-  pre-release-checks:
-    runs-on: ubuntu-latest
-    if: |
-      !contains(github.event.pull_request.body, '[skip changelog]') &&
-      !contains(github.event.pull_request.body, '[changelog skip]') &&
-      !contains(github.event.pull_request.body, '[skip ci]') &&
-      !contains(github.event.pull_request.labels.*.name, 'skip changelog')
-    steps:
-      - uses: actions/checkout@v2
-      - name: Fetch origin
-        run: |
-          git fetch origin ${{ github.base_ref }} --depth 1
-      - name: Check that CHANGELOG.md is touched
-        run: |
-          git diff remotes/origin/${{ github.base_ref }} --name-only | grep CHANGELOG.md
-      - name: Check that compose/lib/compose/version.rb is touched
-        run: |
-          git diff remotes/origin/${{ github.base_ref }} --name-only | grep version.rb
   release:
     runs-on: ubuntu-latest
     steps:
