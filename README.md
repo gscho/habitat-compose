@@ -97,7 +97,7 @@ services:
     load_args:
     - "arg1=foo" # any option that can be passed to hab svc load
     config_toml: |
-    [table]
-    string = "value"
+      [table]
+      string = "value"
 
 ```
